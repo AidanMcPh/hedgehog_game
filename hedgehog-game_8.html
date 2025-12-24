@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hedgehog Tamagotchi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: url('kaipattern.jpg') repeat;
+            background-color: #4CAF50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: #2d3748;
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .screen {
+            background: #f9f6f1;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            min-height: 400px;
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .hedgehog-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            min-height: 120px;
+        }
+
+        .hedgehog {
+            font-size: 80px;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .hedgehog:hover {
+            transform: scale(1.1);
+        }
+
+        .hedgehog.sleeping {
+            animation: none;
+        }
+
+        .hedgehog.happy {
+            animation: spin 0.5s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            background: #fcfaf7;
+            padding: 12px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .stat-bar {
+            background: #e2e8f0;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .stat-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .hunger-fill { background: linear-gradient(90deg, #f56565, #fc8181); }
+        .happiness-fill { background: linear-gradient(90deg, #48bb78, #68d391); }
+        .energy-fill { background: linear-gradient(90deg, #4299e1, #63b3ed); }
+
+        .stat-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            color: #2d3748;
+            font-size: 12px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            text-align: center;
+            padding: 10px;
+            background: #f5f2ed;
+            border-radius: 10px;
+            margin-top: 15px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .status {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .emoji {
+            font-size: 24px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="screen">
+            <h1>🦔 Hedgehog Care 🦔</h1>
+            
+            <div class="status" id="status">Happy & Healthy!</div>
+            
+            <div class="hedgehog-container">
+                <div class="hedgehog" id="hedgehog" onclick="petHedgehog()">
+                    <img id="hedgehog-img" src="hedgehog_happy.png" alt="hedgehog" style="width: 120px; height: auto;">
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-label">🌰 Hunger</div>
+                    <div class="stat-bar">
+                        <div class="stat-fill hunger-fill" id="hunger-fill"></div>
+                        <div class="stat-value" id="hunger-value">100%</div>
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-label">😊 Happiness</div>
+                    <div class="stat-bar">
+                        <div class="stat-fill happiness-fill" id="happiness-fill"></div>
+                        <div class="stat-value" id="happiness-value">100%</div>
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-label">⚡ Energy</div>
+                    <div class="stat-bar">
+                        <div class="stat-fill energy-fill" id="energy-fill"></div>
+                        <div class="stat-value" id="energy-value">100%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="message" id="message">Click on your hedgehog to pet it!</div>
+        </div>
+
+        <div class="buttons">
+            <button onclick="feedHedgehog()">🌰 Feed</button>
+            <button onclick="playWithHedgehog()">🎾 Play</button>
+            <button onclick="giveWater()">💧 Water</button>
+            <button onclick="putToSleep()">😴 Sleep</button>
+        </div>
+    </div>
+
+    <script>
+        let hunger = 100;
+        let happiness = 100;
+        let energy = 100;
+        let isSleeping = false;
+
+        // Array of hedgehog images (excluding grumpy)
+        const hedgehogImages = [
+            'hedgehog_happy.png',
+            'hedgehog_surprised.png',
+            'hedgehog_excited.png',
+            'hedgehog_smiling.png',
+            'hedgehog_curious.png',
+            'hedgehog_sleeping.png',
+            'hedgehog_laughing.png'
+        ];
+        let currentImageIndex = 0;
+
+        // Change hedgehog image every 20 seconds (only when not sleeping)
+        setInterval(() => {
+            if (!isSleeping) {
+                currentImageIndex = (currentImageIndex + 1) % hedgehogImages.length;
+                document.getElementById('hedgehog-img').src = hedgehogImages[currentImageIndex];
+            }
+        }, 20000);
+
+        function updateStats() {
+            document.getElementById('hunger-fill').style.width = hunger + '%';
+            document.getElementById('hunger-value').textContent = Math.round(hunger) + '%';
+            
+            document.getElementById('happiness-fill').style.width = happiness + '%';
+            document.getElementById('happiness-value').textContent = Math.round(happiness) + '%';
+            
+            document.getElementById('energy-fill').style.width = energy + '%';
+            document.getElementById('energy-value').textContent = Math.round(energy) + '%';
+
+            updateStatus();
+        }
+
+        function updateStatus() {
+            const hedgehog = document.getElementById('hedgehog');
+            const hedgehogImg = document.getElementById('hedgehog-img');
+            const status = document.getElementById('status');
+
+            if (isSleeping) {
+                status.textContent = '😴 Sleeping...';
+                hedgehog.classList.add('sleeping');
+                hedgehogImg.src = 'hedgehog_sleeping.png';
+                return;
+            } else {
+                hedgehog.classList.remove('sleeping');
+                // Resume normal cycling when awake
+                hedgehogImg.src = hedgehogImages[currentImageIndex];
+            }
+
+            if (hunger < 20 || happiness < 20 || energy < 20) {
+                status.textContent = '😢 Very Unhappy!';
+            } else if (hunger < 40 || happiness < 40 || energy < 40) {
+                status.textContent = '😟 Needs Care';
+            } else if (hunger > 80 && happiness > 80 && energy > 80) {
+                status.textContent = '🎉 Super Happy!';
+            } else {
+                status.textContent = '😊 Doing Well';
+            }
+        }
+
+        function showMessage(msg) {
+            document.getElementById('message').innerHTML = msg;
+        }
+
+        function feedHedgehog() {
+            if (isSleeping) {
+                showMessage('🦔 Shhh... Your hedgehog is sleeping!');
+                return;
+            }
+            
+            hunger = Math.min(100, hunger + 30);
+            happiness = Math.min(100, happiness + 5);
+            updateStats();
+            showMessage('🌰 Nom nom! Your hedgehog enjoyed the meal!');
+            animateHappy();
+        }
+
+        function playWithHedgehog() {
+            if (isSleeping) {
+                showMessage('🦔 Shhh... Your hedgehog is sleeping!');
+                return;
+            }
+            
+            if (energy < 20) {
+                showMessage('😴 Too tired to play! Let your hedgehog rest.');
+                return;
+            }
+
+            happiness = Math.min(100, happiness + 25);
+            energy = Math.max(0, energy - 15);
+            hunger = Math.max(0, hunger - 10);
+            updateStats();
+            showMessage('🎾 Wheee! Your hedgehog had fun playing!');
+            animateHappy();
+        }
+
+        function giveWater() {
+            if (isSleeping) {
+                showMessage('🦔 Shhh... Your hedgehog is sleeping!');
+                return;
+            }
+            
+            hunger = Math.min(100, hunger + 10);
+            happiness = Math.min(100, happiness + 5);
+            updateStats();
+            showMessage('💧 Refreshing! Your hedgehog is hydrated!');
+            animateHappy();
+        }
+
+        function putToSleep() {
+            if (isSleeping) {
+                isSleeping = false;
+                energy = 100;
+                showMessage('🌅 Good morning! Your hedgehog is well rested!');
+            } else {
+                if (energy > 50) {
+                    showMessage('⚡ Not tired yet! Play more first.');
+                    return;
+                }
+                isSleeping = true;
+                showMessage('😴 Zzz... Sweet dreams little hedgehog!');
+            }
+            updateStats();
+        }
+
+        function petHedgehog() {
+            if (isSleeping) {
+                showMessage('🦔 Careful! You might wake your hedgehog!');
+                return;
+            }
+            
+            happiness = Math.min(100, happiness + 3);
+            updateStats();
+            showMessage('💕 Your hedgehog loves the attention!');
+            animateHappy();
+        }
+
+        function animateHappy() {
+            const hedgehog = document.getElementById('hedgehog');
+            hedgehog.classList.add('happy');
+            setTimeout(() => hedgehog.classList.remove('happy'), 500);
+        }
+
+        // Passive stat decay
+        setInterval(() => {
+            if (!isSleeping) {
+                hunger = Math.max(0, hunger - 0.5);
+                happiness = Math.max(0, happiness - 0.3);
+                energy = Math.max(0, energy - 0.2);
+                updateStats();
+            }
+        }, 2000);
+
+        // Initialize
+        updateStats();
+    </script>
+</body>
+</html>
