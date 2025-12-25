@@ -200,12 +200,55 @@
             font-size: 24px;
             margin-right: 8px;
         }
+
+        .name-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #name-input {
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            background: white;
+            width: 180px;
+            margin-right: 5px;
+        }
+
+        #name-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .name-btn {
+            padding: 10px 15px;
+            font-size: 10px;
+            margin: 5px 0;
+        }
+
+        .hedgehog-name {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
     <div class="game-container">
         <div class="screen">
             <h1>🦔 Hedgehog Care 🦔</h1>
+            
+            <div class="name-section" id="name-section">
+                <input type="text" id="name-input" placeholder="Name your hedgehog..." maxlength="15">
+                <button onclick="setName()" class="name-btn">Set Name</button>
+            </div>
+            
+            <div class="hedgehog-name" id="hedgehog-name" style="display: none;"></div>
             
             <div class="status" id="status">Happy & Healthy!</div>
             
@@ -257,6 +300,42 @@
         let happiness = 100;
         let energy = 100;
         let isSleeping = false;
+        let hedgehogName = localStorage.getItem('hedgehogName') || '';
+
+        // Check if name already exists
+        if (hedgehogName) {
+            document.getElementById('name-section').style.display = 'none';
+            document.getElementById('hedgehog-name').style.display = 'block';
+            document.getElementById('hedgehog-name').textContent = hedgehogName;
+        }
+
+        function setName() {
+            const nameInput = document.getElementById('name-input');
+            const name = nameInput.value.trim();
+            
+            if (name) {
+                hedgehogName = name;
+                localStorage.setItem('hedgehogName', name);
+                document.getElementById('name-section').style.display = 'none';
+                document.getElementById('hedgehog-name').style.display = 'block';
+                document.getElementById('hedgehog-name').textContent = name;
+                showMessage(`💕 Meet ${name}, your new hedgehog friend!`);
+            } else {
+                showMessage('Please enter a name!');
+            }
+        }
+
+        // Allow Enter key to set name
+        document.addEventListener('DOMContentLoaded', function() {
+            const nameInput = document.getElementById('name-input');
+            if (nameInput) {
+                nameInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        setName();
+                    }
+                });
+            }
+        });
 
         // Array of hedgehog images (excluding grumpy)
         const hedgehogImages = [
@@ -318,13 +397,13 @@
             }
 
             if (hunger < 20 || happiness < 20 || energy < 20) {
-                status.textContent = '😢 Very Unhappy!';
+                status.textContent = '(｡Ó﹏Ò｡) Very Unhappy!';
             } else if (hunger < 40 || happiness < 40 || energy < 40) {
-                status.textContent = '😟 Needs Care';
+                status.textContent = '(๑¯ω¯๑) Needs Care';
             } else if (hunger > 80 && happiness > 80 && energy > 80) {
-                status.textContent = '🎉 Super Happy!';
+                status.textContent = '( ⁎ᵕᴗᵕ⁎ ） Super Happy!';
             } else {
-                status.textContent = '😊 Doing Well';
+                status.textContent = '(๑¯ω¯๑) Doing Well';
             }
         }
 
