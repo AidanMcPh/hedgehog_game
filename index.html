@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hedgehog Tamagotchi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,7 +15,7 @@
         }
 
         body {
-            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-family: 'Press Start 2P', cursive;
             background: url('kaipattern.jpg') repeat;
             background-color: #4CAF50;
             display: flex;
@@ -44,7 +47,8 @@
             text-align: center;
             color: #2d3748;
             margin-bottom: 20px;
-            font-size: 24px;
+            font-size: 18px;
+            line-height: 1.6;
         }
 
         .hedgehog-container {
@@ -101,7 +105,7 @@
             font-weight: bold;
             color: #4a5568;
             margin-bottom: 5px;
-            font-size: 14px;
+            font-size: 11px;
         }
 
         .stat-bar {
@@ -129,7 +133,7 @@
             transform: translate(-50%, -50%);
             font-weight: bold;
             color: #2d3748;
-            font-size: 12px;
+            font-size: 10px;
         }
 
         .buttons {
@@ -144,11 +148,12 @@
             border: none;
             padding: 15px;
             border-radius: 15px;
-            font-size: 16px;
+            font-size: 12px;
             font-weight: bold;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            line-height: 1.4;
         }
 
         button:hover {
@@ -178,14 +183,17 @@
             justify-content: center;
             font-weight: bold;
             color: #4a5568;
+            font-size: 10px;
+            line-height: 1.6;
         }
 
         .status {
             text-align: center;
-            font-size: 18px;
+            font-size: 14px;
             font-weight: bold;
             color: #2d3748;
             margin-bottom: 15px;
+            line-height: 1.6;
         }
 
         .emoji {
@@ -217,7 +225,7 @@
                 </div>
 
                 <div class="stat">
-                    <div class="stat-label">😊 Happiness</div>
+                    <div class="stat-label" id="happiness-label">( ⁎ᵕᴗᵕ⁎ ） Happiness</div>
                     <div class="stat-bar">
                         <div class="stat-fill happiness-fill" id="happiness-fill"></div>
                         <div class="stat-value" id="happiness-value">100%</div>
@@ -276,6 +284,16 @@
             
             document.getElementById('happiness-fill').style.width = happiness + '%';
             document.getElementById('happiness-value').textContent = Math.round(happiness) + '%';
+            
+            // Update happiness emoji based on level
+            const happinessLabel = document.getElementById('happiness-label');
+            if (happiness > 70) {
+                happinessLabel.textContent = '( ⁎ᵕᴗᵕ⁎ ） Happiness';
+            } else if (happiness >= 40) {
+                happinessLabel.textContent = '(๑¯ω¯๑) Happiness';
+            } else {
+                happinessLabel.textContent = '(｡Ó﹏Ò｡) Happiness';
+            }
             
             document.getElementById('energy-fill').style.width = energy + '%';
             document.getElementById('energy-value').textContent = Math.round(energy) + '%';
